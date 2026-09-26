@@ -1,0 +1,31 @@
+schema: spec-driven
+
+context: |
+  Syn is a conservative, auditable GitHub issue and pull-request review service.
+  The MVP is a Go 1.27 webhook service and CLI. It automatically reviews signed,
+  allowlisted GitHub events, stores an immutable canonical record, and may create
+  or edit one Syn-owned advisory conversation comment per issue or pull request.
+
+  Repository content is untrusted. The deterministic safety gate runs before any
+  model or agent, and failure, ambiguity, stale state, or missing policy fails
+  closed. The review runner has no GitHub write credential. A separate publisher
+  may receive a narrowly scoped comment credential only after the record has been
+  stored and policy and freshness have been revalidated.
+
+  The immutable service ceiling forbids every GitHub mutation except create/update
+  of Syn's single marker-backed issue or pull-request conversation comment. The MVP
+  is licensed AGPL-3.0-or-later. Product requirements are tracked in GitHub issue #3.
+
+rules:
+  specs:
+    - State observable product behavior with SHALL or MUST requirements.
+    - Give every requirement at least one GIVEN/WHEN/THEN scenario.
+    - Include refusal, replay, stale-state, and credential-boundary scenarios where relevant.
+    - Keep implementation choices in design.md unless they are part of the product contract.
+  design:
+    - Document trust boundaries, credential ownership, durable state, and fail-closed behavior.
+    - Record alternatives and explain why rejected options do not satisfy the MVP ceiling.
+  tasks:
+    - Keep tasks ordered by dependency and independently verifiable.
+    - Include automated tests for security boundaries and every allowed webhook event.
+    - Do not mark a task complete until its stated verification passes.
