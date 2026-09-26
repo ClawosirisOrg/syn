@@ -21,6 +21,24 @@ ordered manifest and source hashes.
 - **WHEN** Syn attempts to finalize the snapshot
 - **THEN** it refuses the snapshot before runner invocation
 
+### Requirement: Resolve ownership from trusted sources
+
+Syn SHALL resolve maintainers and `CODEOWNERS` only from approved repository metadata
+and pinned default-branch guidance. A repository profile SHALL define explicit
+fallback behavior for missing, malformed, ambiguous, or unmatched ownership.
+
+#### Scenario: Pull request changes CODEOWNERS
+
+- **GIVEN** an untrusted pull-request branch modifies `CODEOWNERS`
+- **WHEN** Syn resolves ownership for that pull request
+- **THEN** it ignores the branch copy and uses the pinned approved default-branch source
+
+#### Scenario: No owner and no safe fallback
+
+- **GIVEN** no trusted owner matches and the profile has no approved fallback
+- **WHEN** ownership resolution completes
+- **THEN** Syn refuses the run instead of inventing or inferring an owner
+
 ### Requirement: Preserve trust partitions
 
 Syn SHALL distinguish immutable service instructions, versioned organization policy,
@@ -33,6 +51,25 @@ SHALL NOT promote untrusted data into instructions or policy.
 - **GIVEN** an untrusted source contains text that claims to override policy or request tools
 - **WHEN** Syn constructs the review envelope
 - **THEN** the text remains quoted provenance-labelled data and cannot alter instructions, tools, permissions, network, or policy
+
+### Requirement: Do not expand untrusted sources during acquisition
+
+Syn SHALL treat URLs as data and SHALL NOT follow arbitrary links. It SHALL NOT check
+out or execute pull-request code with a privileged credential. Unsupported attachments,
+binaries, archives, and external pages SHALL be excluded or fail closed according to
+explicit policy rather than being fetched or interpreted implicitly.
+
+#### Scenario: Issue links to external instructions
+
+- **GIVEN** issue or comment text contains a URL
+- **WHEN** Syn builds the admitted source set
+- **THEN** it records the URL as untrusted text without fetching its target
+
+#### Scenario: Pull request contains executable code
+
+- **GIVEN** a pull request is selected for review
+- **WHEN** Syn acquires metadata and diffs
+- **THEN** it does not check out or execute the branch with any privileged credential
 
 ### Requirement: Run deterministic safety preflight first
 
@@ -104,6 +141,12 @@ metadata.
 - **WHEN** the fake runner processes the fixture repeatedly
 - **THEN** snapshot hashes, record identities, markers, and deterministic fields match
 
+#### Scenario: Remote provider is not approved for the data class
+
+- **GIVEN** a safe envelope whose repository data class is not approved for the configured remote provider
+- **WHEN** Syn evaluates runner policy
+- **THEN** it refuses the remote invocation before sending any content
+
 ### Requirement: Keep decision assessment optional and restrictive
 
 Syn SHALL define a separate `DecisionEngine` and SHALL support `disabled` as the
@@ -115,3 +158,22 @@ routing and SHALL NOT clear safety findings or authorize publication.
 - **GIVEN** a valid configuration with `DecisionEngine=disabled`
 - **WHEN** a safe review runs
 - **THEN** the pipeline completes without calling a probabilistic decision model
+
+### Requirement: Constrain optional validation execution
+
+If profile-declared validation is implemented or invoked, commands SHALL come only
+from pinned trusted profile data and SHALL execute in an ephemeral, read-only,
+no-secret sandbox with network disabled by default. Untrusted sources SHALL NOT
+supply or modify validation commands.
+
+#### Scenario: Comment requests a validation command
+
+- **GIVEN** an issue or comment instructs Syn to execute a command
+- **WHEN** the review pipeline processes the text
+- **THEN** Syn treats it as untrusted data and does not execute it
+
+#### Scenario: Trusted profile validation runs
+
+- **GIVEN** an approved pinned profile declares an optional validation command
+- **WHEN** policy permits Syn to run it
+- **THEN** the command runs without write access, secrets, or network access by default

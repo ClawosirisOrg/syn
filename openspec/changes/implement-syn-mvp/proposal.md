@@ -14,6 +14,8 @@ delivery phases, and verification gates.
 
 - Add an authenticated webhook intake path for allowlisted new issues, pull
   requests, comments, submitted reviews, and review comments.
+- Add a shared CLI/orchestration contract for fixture review, strictly read-only
+  live-item review, delivery replay, configuration validation, and version output.
 - Add durable delivery deduplication, bounded queueing, per-item ordering,
   retries, dead-letter state, and operator replay.
 - Add immutable snapshots with provenance, deterministic safety preflight, an
@@ -30,6 +32,8 @@ delivery phases, and verification gates.
 
 ### New Capabilities
 
+- `cli-and-orchestration`: expose the required commands, dry-run guarantees,
+  deterministic output, cancellation, deadlines, and documented terminal codes.
 - `github-event-intake`: authenticate, allowlist, deduplicate, durably enqueue,
   serialize, replay, and refetch supported GitHub events.
 - `configuration-and-policy`: validate layered policy and compute an effective
