@@ -4,9 +4,11 @@
 
 ### Requirement: Authenticate before interpretation
 
-The service SHALL verify `X-Hub-Signature-256` over the exact bounded raw body
-using the configured webhook secret and constant-time comparison before decoding
-JSON, consulting repository policy, queueing work, or making an external call.
+The service SHALL expose one narrowly scoped webhook endpoint with explicit header
+and raw-body limits. It SHALL verify `X-Hub-Signature-256` as HMAC-SHA-256 over the
+exact bounded raw body using the configured webhook secret and constant-time
+comparison before decoding JSON, consulting repository policy, queueing work, or
+making an external call.
 
 #### Scenario: Valid signed delivery
 
@@ -20,6 +22,12 @@ JSON, consulting repository policy, queueing work, or making an external call.
 - **GIVEN** a missing or invalid signature, malformed required header, or oversized body
 - **WHEN** the webhook endpoint receives the request
 - **THEN** Syn rejects it before JSON interpretation, GitHub access, queue insertion, or runner invocation
+
+#### Scenario: Malformed verified JSON
+
+- **GIVEN** a correctly signed body that is not a valid supported webhook payload
+- **WHEN** Syn decodes it after signature verification
+- **THEN** Syn rejects it before queue insertion, GitHub access, or runner invocation
 
 ### Requirement: Admit only supported allowlisted events
 
@@ -119,3 +127,21 @@ state is not dropped and older work cannot publish as current.
 - **GIVEN** a valid webhook contains only partial item context
 - **WHEN** Syn acquires the review snapshot
 - **THEN** it uses the read-only GitHub API rather than treating the payload as the complete review source
+
+### Requirement: Separate webhook and read credentials
+
+Outbound GitHub reads SHALL use a narrowly scoped GitHub App installation credential.
+Syn SHALL NOT use the webhook signing secret as an API credential, expose the read
+credential to the runner, or retain the raw webhook body as a canonical record.
+
+#### Scenario: Authoritative refetch starts
+
+- **GIVEN** a verified accepted delivery
+- **WHEN** Syn requests authoritative GitHub state
+- **THEN** it uses the read-only installation capability and neither the webhook secret nor publisher credential
+
+#### Scenario: Receipt becomes durable
+
+- **GIVEN** Syn has extracted the minimum verified identity needed for deduplication, audit, replay, and diagnosis
+- **WHEN** durable acceptance completes
+- **THEN** the durable receipt excludes the unnecessary raw webhook body

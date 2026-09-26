@@ -54,8 +54,11 @@ GitHub webhook
 
 Manual `review-fixture` and `review-github` commands enter at snapshot acquisition
 and use the same policy, preflight, runner, record, freshness, and rendering code.
-`review-github` defaults to dry-run. `replay-delivery` requeues an existing sanitized
-receipt rather than accepting arbitrary replacement payload data.
+They do not acquire the publisher credential or write to GitHub; `review-github` is
+strictly read-only and both commands render a dry-run preview. `replay-delivery`
+requeues an existing sanitized receipt rather than accepting arbitrary replacement
+payload data. Only `serve` may publish, and only when its explicit runtime switch and
+every effective-policy layer authorize the specific target and comment class.
 
 ## Component boundaries
 
@@ -90,6 +93,11 @@ covers the normalized manifest and content hashes, while runtime timestamps are
 excluded from deterministic identity. The triggering receipt and actor remain bound
 to the record even when multiple deliveries observe equivalent content.
 
+Maintainer and ownership resolution reads pinned default-branch `CODEOWNERS` and
+approved repository metadata only. Missing, malformed, ambiguous, or unmatched
+ownership follows an explicit profile fallback; if the profile has no safe fallback,
+the run refuses instead of inventing an owner or trusting pull-request content.
+
 ### Safety and review
 
 The preflight normalizes supported encodings, enforces source and aggregate limits,
@@ -113,6 +121,12 @@ may use direct OpenAI-compatible HTTP through a destination allowlist.
 `DecisionEngine` is a separate optional interface. The `disabled` implementation is
 the normal MVP setting. Any future engine may only restrict routing and can never
 clear a deterministic finding or authorize publication.
+
+Profile-declared validation is optional in the MVP. If implemented, validation
+commands come only from pinned trusted profile data and execute in an ephemeral,
+read-only, no-secret sandbox with network disabled by default. No issue, comment,
+pull-request branch, filename, commit message, or linked content can supply or alter
+a validation command.
 
 ### Records and publication
 
@@ -196,6 +210,9 @@ Every stage returns a typed outcome and terminal error class. Retriable infrastr
 failures are bounded; policy, safety, schema, and ambiguity failures are terminal.
 Health distinguishes HTTP availability, intake enablement, worker readiness,
 publisher state, queue depth, and dead-letter count without exposing payloads.
+Operator state exposes whether each accepted delivery is published, refused,
+quarantined, superseded, failed, or dead-lettered. Refusal details are bounded and
+actionable without reproducing sensitive source content.
 
 The publisher has an immediate kill switch independent of intake. If a trust-boundary
 or publication invariant fails, operators disable publication first, then intake and
@@ -249,10 +266,14 @@ was detected. The MVP records an operator-visible outcome but renders no public 
 A private notification adapter remains out of the public publication path and must
 be separately designed before use.
 
-## Decisions required before live pilots
+## Decisions required before activation
 
-The following may remain placeholders through fixture work but must be recorded
-before enabling automatic live publication: service and GitHub App owner; webhook
-endpoint and secret custody; credential rotation; provider and permitted data
-classes; private-repository inference constraints; retention periods; budget and
-latency ceilings; private security escalation route; and incident owner.
+Service and GitHub App ownership, publisher-credential ownership, webhook endpoint
+custody, webhook-secret custody, delivery retention, and credential rotation SHALL
+be recorded before automatic webhook intake is enabled.
+
+Provider and permitted data classes, private-repository inference constraints,
+snapshot/prompt/output/audit retention, budget and latency ceilings, the approved
+private security-escalation route, and incident ownership SHALL additionally be
+recorded before a real reviewer or private repository is enabled. An absent or
+ambiguous private escalation route is a fail-closed condition for affected data.
