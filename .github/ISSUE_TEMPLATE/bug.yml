@@ -1,0 +1,36 @@
+name: Bug report
+description: Report reproducible incorrect behavior that is not a vulnerability
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities or private repository data here. Use private vulnerability reporting instead.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide minimal steps using synthetic or public data.
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Syn revision or version
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove credentials, private content, and personal data.
+      render: text
