@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Command syn is the entry point for the Syn review service.
 package main
 
