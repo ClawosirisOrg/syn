@@ -2,13 +2,16 @@
 
 - [ ] 1.1 Document the threat model, credential boundaries, immutable service
   action ceiling, stop conditions, and operator rollback procedure.
-- [ ] 1.2 Define strict versioned schemas for service config, organization policy,
+- [ ] 1.2 Define strict versioned schemas for service policy/config, organization policy,
   repository profile, source manifest, safety result, review decision, canonical
-  record, delivery receipt, and publication receipt.
+  record, project-context manifest, prior-record projection, delivery receipt,
+  and publication receipt.
 - [ ] 1.3 Implement unknown-field rejection and effective-policy intersection;
   test that lower layers and overprivileged credentials cannot expand the ceiling.
 - [ ] 1.4 Add safe example configurations with intake and publication default-off
   and no representation for forbidden GitHub mutations.
+- [ ] 1.5 Add `AGPL-3.0-or-later` SPDX identifiers to all new source files and
+  verify that generated or bundled material has compatible licensing metadata.
 
 ## 2. Shared fixture pipeline
 
@@ -16,16 +19,30 @@
   `validate-config`, and `version` commands with cancellation, deadlines, dry-run
   defaults, and documented exit codes.
 - [ ] 2.2 Implement source normalization, canonical ordering, provenance manifests,
-  trust partitioning, deterministic hashes, and incomplete-source refusal.
+  trust partitioning, deterministic hashes, incomplete-source refusal, and pinned
+  default-branch `CODEOWNERS` resolution with explicit fallback behavior; add the
+  bounded `ProjectContextBundle` with coverage and truncation metadata.
 - [ ] 2.3 Implement deterministic safety orchestration, detector interfaces, all
   four outcomes, bounded redaction references, and fail-closed scanner behavior.
 - [ ] 2.4 Implement `DecisionEngine` with the fully functional `disabled` default.
 - [ ] 2.5 Implement `ReviewRunner`, strict output validation, and a deterministic
-  fake that exposes invocation counts for negative safety tests.
+  fake that exposes invocation counts for negative safety tests; enforce exactly one
+  semantic reviewer per attempt and reject target-bundled second-reviewer requests.
 - [ ] 2.6 Implement atomic filesystem review records and deterministic dry-run
-  rendering from stored validated records only.
+  rendering from stored validated records only, including context-bundle hashes,
+  prior-record references, and bounded history coverage.
 - [ ] 2.7 Add sanitized VIA-style, simple-alert-proxy, and adversarial fixtures;
-  verify both pilots use the same core interfaces and schemas.
+  document fixture provenance and verify both pilots use the same core interfaces
+  and schemas with no private-repository data unless synthetic or explicitly sanitized.
+- [ ] 2.8 Cover the complete issue #3 adversarial matrix, including prompt and tool
+  injection, Unicode/bidirectional and encoded instructions, nested markup,
+  filenames/commits/code/docs/branch `AGENTS.md`, secrets/private URLs, security
+  reports, oversized/binary/archive data, unsafe paths, incomplete sources, scanner
+  failure, malformed runner output, webhook spoof/replay/order cases, marker/author
+  ambiguity, uncertain writes, and benign lookalikes for detector classes.
+- [ ] 2.9 Add reviewer-lifecycle tests for fresh sessions, absent authoring/private
+  memory, no branch or publisher credentials, bounded prior-record projection,
+  model-memory poisoning attempts, and cleanup after every terminal outcome.
 
 ## 3. Automatic GitHub intake
 
@@ -47,11 +64,13 @@
 ## 4. Real reviewer integration
 
 - [ ] 4.1 Implement one approved backend behind `ReviewRunner` with destination
-  allowlisting, explicit provider/data-class policy, timeouts, and cancellation.
+  allowlisting, explicit provider/data-class policy, timeouts, cancellation, and
+  fresh read-only project-specialist review mode where an agent adapter is used.
 - [ ] 4.2 Strip ambient secrets and GitHub credentials, deny general-purpose tools,
+  authoring transcripts, bootstrap/private agent memory, branch-write authority,
   and validate all backend output against the strict decision schema.
 - [ ] 4.3 Record provider/model/adapter identity, version, latency, token/cost fields,
-  and terminal error class without leaking input or secrets.
+  context-bundle identity, and terminal error class without leaking input or secrets.
 - [ ] 4.4 Compare the backend with deterministic fixtures in dry-run mode and document
   privacy, cost, latency, and failure observations.
 - [ ] 4.5 Block live publication for the fake runner, an unapproved provider/data
@@ -82,11 +101,14 @@
 - [ ] 6.1 Add structured redacted logs and health/readiness output for intake,
   workers, publisher state, queue depth, and dead-letter count.
 - [ ] 6.2 Document deployment, configuration, GitHub App permissions, credential
-  ownership/rotation, replay, retention, cleanup, stop conditions, and recovery.
+  ownership/rotation, replay, fixture provenance, retention, security assumptions,
+  limitations, cleanup, stop conditions, and recovery.
 - [ ] 6.3 Run formatting, unit, end-to-end, fuzz smoke, race, vet, and CodeQL checks;
   retain reviewed deterministic goldens with no secrets or private data.
-- [ ] 6.4 Record all required ownership, provider, retention, budget, escalation, and
-  incident decisions before enabling a real or private-repository pilot.
+- [ ] 6.4 Record service/App/publisher ownership, webhook endpoint and secret
+  custody, delivery retention, and credential rotation before automatic intake;
+  record provider, data-class, private-inference, full-retention, budget, escalation,
+  and incident decisions before a real reviewer or private repository is enabled.
 - [ ] 6.5 Run 3-5 approved items for each pilot profile with live marker-backed
   comments and classify feedback as useful, incorrect, unsafe, or insufficient.
 - [ ] 6.6 Publish latency, cost, false-positive, quarantine, refusal, and safety

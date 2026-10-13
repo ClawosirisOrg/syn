@@ -23,9 +23,10 @@ expand a higher-layer capability.
 
 ### Requirement: Reject ambiguous configuration
 
-Versioned organization and repository configuration SHALL reject unknown fields,
-missing explicit repository and event allowlists, unsupported schema versions, and
-ambiguous ownership or policy references.
+Versioned service policy/configuration, organization policy, and repository profiles
+SHALL reject unknown fields, missing explicit repository and event allowlists,
+unsupported schema versions, and ambiguous ownership or policy references.
+They SHALL load from YAML or JSON with equivalent validation semantics.
 
 #### Scenario: Installed but not allowlisted
 
@@ -38,6 +39,12 @@ ambiguous ownership or policy references.
 - **GIVEN** a profile contains an unrecognized property
 - **WHEN** configuration is loaded
 - **THEN** Syn rejects the profile instead of silently ignoring the property
+
+#### Scenario: Equivalent YAML and JSON policies
+
+- **GIVEN** YAML and JSON documents representing the same supported policy values
+- **WHEN** Syn validates and resolves each document
+- **THEN** they produce the same effective policy and validation result
 
 ### Requirement: Require layered publication approval
 

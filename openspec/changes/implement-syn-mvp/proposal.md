@@ -14,11 +14,16 @@ delivery phases, and verification gates.
 
 - Add an authenticated webhook intake path for allowlisted new issues, pull
   requests, comments, submitted reviews, and review comments.
+- Add a shared CLI/orchestration contract for fixture review, strictly read-only
+  live-item review, delivery replay, configuration validation, and version output.
 - Add durable delivery deduplication, bounded queueing, per-item ordering,
   retries, dead-letter state, and operator replay.
 - Add immutable snapshots with provenance, deterministic safety preflight, an
-  isolated review-runner interface, and a disabled decision-engine default.
+  explicit bounded project-context bundle, one disposable isolated review-runner
+  interface per attempt, and a disabled decision-engine default.
 - Add atomic, versioned canonical review records before any public projection.
+- Preserve review continuity through provenance-linked record projections and
+  maintainer-owned repository knowledge rather than persistent agent memory.
 - Add a separately credentialed deterministic publisher that creates or edits
   one Syn-owned marker-backed advisory conversation comment per item.
 - Add hierarchical configuration, publication kill switches, health state,
@@ -30,12 +35,15 @@ delivery phases, and verification gates.
 
 ### New Capabilities
 
+- `cli-and-orchestration`: expose the required commands, dry-run guarantees,
+  deterministic output, cancellation, deadlines, and documented terminal codes.
 - `github-event-intake`: authenticate, allowlist, deduplicate, durably enqueue,
   serialize, replay, and refetch supported GitHub events.
 - `configuration-and-policy`: validate layered policy and compute an effective
   action ceiling that lower layers cannot expand.
 - `safety-and-review`: build bounded provenance-labelled snapshots, fail closed
-  through deterministic preflight, and invoke a capability-limited runner.
+  through deterministic preflight, build explicit project context, and invoke
+  one capability-limited semantic runner in a fresh review attempt.
 - `canonical-review-records`: store versioned decisions atomically before any
   rendering or publication.
 - `advisory-comment-publication`: render and safely create or update exactly one

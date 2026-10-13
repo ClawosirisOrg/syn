@@ -12,7 +12,7 @@ metadata, and one stable hidden marker keyed by repository and item.
 
 - **GIVEN** a stored publishable review record
 - **WHEN** Syn renders its projection
-- **THEN** the body contains advice and the stable marker without raw untrusted payloads or forbidden sensitive data
+- **THEN** the body contains advice and the stable marker without secrets, exploit instructions, private hostnames, tokens, receiver URLs, raw private payloads, quarantined text, or other forbidden sensitive data
 
 #### Scenario: Refused or quarantined record
 
@@ -37,6 +37,25 @@ model output or untrusted sources, and SHALL expose no other GitHub mutation met
 - **GIVEN** runner output contains prose that asks for a label, close, push, approval, merge, or alternate write
 - **WHEN** schema validation and publication policy run
 - **THEN** the request cannot become a publisher capability or GitHub call
+
+### Requirement: Publish approved automatic reviews without per-event intervention
+
+When `serve` has publication enabled and an automatically accepted review is safe,
+fresh, schema-valid, produced by an approved real runner, stored canonically, and
+permitted by every effective-policy layer, Syn SHALL invoke the publisher without
+requiring operator action for that individual event.
+
+#### Scenario: Safe approved automatic issue review
+
+- **GIVEN** a supported signed issue event completes all review and publication gates
+- **WHEN** its canonical record is durably committed
+- **THEN** Syn automatically creates or updates the single verified advisory comment
+
+#### Scenario: Automatic review fails a gate
+
+- **GIVEN** an automatic review is refused, quarantined, stale, schema-invalid, disabled, or produced by an unapproved runner
+- **WHEN** publication is evaluated
+- **THEN** Syn records the non-published outcome and makes no GitHub write
 
 ### Requirement: Maintain one Syn-owned comment per item
 

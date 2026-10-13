@@ -6,7 +6,8 @@
 
 Syn SHALL store a schema-versioned record containing target and trigger identity,
 policy/profile/gate/schema versions, immutable snapshot and manifest references,
-resolved ownership, safety outcome, optional decision assessment, validated review
+resolved ownership, safety outcome, context-bundle hash and entry references,
+prior-record projection metadata, optional decision assessment, validated review
 decision, runner metadata, publication intent, runtime outcome, and record identity.
 
 #### Scenario: Safe completed review
@@ -20,6 +21,26 @@ decision, runner metadata, publication intent, runtime outcome, and record ident
 - **GIVEN** preflight refuses or quarantines a snapshot
 - **WHEN** the run terminates
 - **THEN** Syn writes a minimal canonical safety record without fabricated review output
+
+### Requirement: Preserve retained-context provenance and coverage
+
+Every completed record SHALL identify the exact project-context entries presented to
+the reviewer, their source/version/hash/trust class, the prior canonical record IDs
+and reviewed snapshot hashes projected into the attempt, completed-cycle count, and
+any omitted or truncated history. Raw private coding-agent memory and resumable
+reviewer-session state SHALL NOT be record inputs.
+
+#### Scenario: Prior review history is truncated
+
+- **GIVEN** prior canonical records exceed configured cycle, byte, or age limits
+- **WHEN** Syn constructs and records the context bundle
+- **THEN** the record identifies the retained prior records and marks coverage as truncated without claiming omitted findings were absent
+
+#### Scenario: Same item snapshot receives changed approved context
+
+- **GIVEN** the item snapshot is unchanged but an admitted policy, repository-knowledge, or prior-record projection changes
+- **WHEN** Syn computes record identity
+- **THEN** the context-bundle hash changes and the new review cannot reuse the earlier record identity
 
 ### Requirement: Persist records atomically before projection
 
@@ -41,7 +62,8 @@ filesystem path before rendering a comment or invoking the publisher.
 ### Requirement: Minimize sensitive retained data
 
 Canonical records SHALL NOT contain raw secrets, quarantined payloads, provider
-credentials, private receiver URLs, or full sensitive findings. They SHALL use
+credentials, private receiver URLs, raw authoring transcripts, private agent memory,
+resumable reviewer sessions, or full sensitive findings. They SHALL use
 bounded hashes, stable locators, classifications, and redaction references.
 
 #### Scenario: Quarantined secret finding

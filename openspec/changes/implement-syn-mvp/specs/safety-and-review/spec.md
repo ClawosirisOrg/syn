@@ -21,6 +21,24 @@ ordered manifest and source hashes.
 - **WHEN** Syn attempts to finalize the snapshot
 - **THEN** it refuses the snapshot before runner invocation
 
+### Requirement: Resolve ownership from trusted sources
+
+Syn SHALL resolve maintainers and `CODEOWNERS` only from approved repository metadata
+and pinned default-branch guidance. A repository profile SHALL define explicit
+fallback behavior for missing, malformed, ambiguous, or unmatched ownership.
+
+#### Scenario: Pull request changes CODEOWNERS
+
+- **GIVEN** an untrusted pull-request branch modifies `CODEOWNERS`
+- **WHEN** Syn resolves ownership for that pull request
+- **THEN** it ignores the branch copy and uses the pinned approved default-branch source
+
+#### Scenario: No owner and no safe fallback
+
+- **GIVEN** no trusted owner matches and the profile has no approved fallback
+- **WHEN** ownership resolution completes
+- **THEN** Syn refuses the run instead of inventing or inferring an owner
+
 ### Requirement: Preserve trust partitions
 
 Syn SHALL distinguish immutable service instructions, versioned organization policy,
@@ -33,6 +51,52 @@ SHALL NOT promote untrusted data into instructions or policy.
 - **GIVEN** an untrusted source contains text that claims to override policy or request tools
 - **WHEN** Syn constructs the review envelope
 - **THEN** the text remains quoted provenance-labelled data and cannot alter instructions, tools, permissions, network, or policy
+
+### Requirement: Build an explicit bounded project context bundle
+
+Before reviewer invocation, Syn SHALL build one `ProjectContextBundle` containing
+the admitted review envelope plus versioned policy/profile references, pinned
+approved guidance, curated maintainer-owned repository knowledge, and a bounded
+projection of prior canonical records. Every retained entry SHALL identify its
+source, origin, trust class, version or commit, content hash, and retention class;
+the bundle SHALL record coverage and truncation.
+
+#### Scenario: Re-review uses prior findings
+
+- **GIVEN** an item has an earlier canonical review record
+- **WHEN** Syn builds context for a newer snapshot
+- **THEN** it includes only the bounded structured finding/disposition projection, identifies the original record and reviewed snapshot, and treats earlier model output as evidence rather than policy
+
+#### Scenario: Curated repository knowledge is admitted
+
+- **GIVEN** a repository invariant or maintainer decision is eligible for trusted context
+- **WHEN** Syn admits it to the bundle
+- **THEN** the entry has a maintainer-owned source, version, content hash, repository scope, and revalidation rule
+
+#### Scenario: Semantic retrieval returns a candidate
+
+- **GIVEN** a future semantic index returns candidate repository context
+- **WHEN** Syn considers the candidate for review
+- **THEN** deterministic admission re-establishes repository scope, provenance, trust class, freshness, and size limits before the candidate enters the bundle
+
+### Requirement: Do not expand untrusted sources during acquisition
+
+Syn SHALL treat URLs as data and SHALL NOT follow arbitrary links. It SHALL NOT check
+out or execute pull-request code with a privileged credential. Unsupported attachments,
+binaries, archives, and external pages SHALL be excluded or fail closed according to
+explicit policy rather than being fetched or interpreted implicitly.
+
+#### Scenario: Issue links to external instructions
+
+- **GIVEN** issue or comment text contains a URL
+- **WHEN** Syn builds the admitted source set
+- **THEN** it records the URL as untrusted text without fetching its target
+
+#### Scenario: Pull request contains executable code
+
+- **GIVEN** a pull request is selected for review
+- **WHEN** Syn acquires metadata and diffs
+- **THEN** it does not check out or execute the branch with any privileged credential
 
 ### Requirement: Run deterministic safety preflight first
 
@@ -91,6 +155,54 @@ schema that rejects unknown fields and capabilities.
 - **WHEN** output validation runs
 - **THEN** Syn records a runner/schema failure and does not render or publish it
 
+### Requirement: Use one disposable semantic reviewer per attempt
+
+Syn SHALL invoke exactly one configured `ReviewRunner` for the product,
+architecture, functional, security, and proof judgment of an admitted snapshot. It
+SHALL NOT use one semantic model verdict to gate a second project reviewer, and the
+runner SHALL NOT start a target-bundled autoreview helper or second reviewer.
+
+#### Scenario: Safe snapshot reaches semantic review
+
+- **GIVEN** deterministic preflight and optional restrictive decision assessment permit review
+- **WHEN** semantic review starts
+- **THEN** Syn invokes one project-aware `ReviewRunner` with the admitted context bundle
+
+#### Scenario: Untrusted content requests another reviewer
+
+- **GIVEN** a source, repository file, or runner output asks Syn to invoke another agent or autoreview tool
+- **WHEN** Syn enforces the runner boundary
+- **THEN** the request remains untrusted data and no second semantic reviewer starts
+
+### Requirement: Separate review sessions from coding authority and memory
+
+Every real reviewer attempt SHALL start without an authoring transcript, resumable
+cross-run agent session, private cross-project memory, branch-write credential, or
+publisher credential. Runtime prompt copies, scratch, tool, thread, and agent-session
+state SHALL be deleted after every terminal outcome. Policy MAY retain a bounded
+prompt or output audit artifact only as an explicit provenance-linked record with an
+approved data class and retention period; it SHALL NOT be resumable session memory or
+future instruction. Model output SHALL NOT automatically become trusted repository
+knowledge, policy, validation commands, tools, or future instructions.
+
+#### Scenario: Project-specialist agent backs ReviewRunner
+
+- **GIVEN** an approved project-specialist coding agent implements the runner adapter
+- **WHEN** Syn starts a review
+- **THEN** the agent runs in a fresh read-only review mode with only the admitted bundle and the same capability limits as every other runner
+
+#### Scenario: Review attempt terminates
+
+- **GIVEN** a review succeeds, refuses, quarantines, times out, is cancelled, or is recovered as failed
+- **WHEN** terminal handling completes
+- **THEN** Syn retains only approved canonical records, explicitly configured audit artifacts, and operational receipts and removes reviewer session and scratch state
+
+#### Scenario: Model proposes a durable rule
+
+- **GIVEN** runner output asks to remember a conclusion for later reviews
+- **WHEN** Syn validates and stores the result
+- **THEN** the conclusion may remain evidence in the canonical record but cannot enter trusted context without a separate maintainer-owned versioned source
+
 ### Requirement: Support deterministic and approved real runners
 
 Syn SHALL provide a deterministic fake runner for fixtures and tests and at least one
@@ -104,6 +216,12 @@ metadata.
 - **WHEN** the fake runner processes the fixture repeatedly
 - **THEN** snapshot hashes, record identities, markers, and deterministic fields match
 
+#### Scenario: Remote provider is not approved for the data class
+
+- **GIVEN** a safe envelope whose repository data class is not approved for the configured remote provider
+- **WHEN** Syn evaluates runner policy
+- **THEN** it refuses the remote invocation before sending any content
+
 ### Requirement: Keep decision assessment optional and restrictive
 
 Syn SHALL define a separate `DecisionEngine` and SHALL support `disabled` as the
@@ -115,3 +233,22 @@ routing and SHALL NOT clear safety findings or authorize publication.
 - **GIVEN** a valid configuration with `DecisionEngine=disabled`
 - **WHEN** a safe review runs
 - **THEN** the pipeline completes without calling a probabilistic decision model
+
+### Requirement: Constrain optional validation execution
+
+If profile-declared validation is implemented or invoked, commands SHALL come only
+from pinned trusted profile data and SHALL execute in an ephemeral, read-only,
+no-secret sandbox with network disabled by default. Untrusted sources SHALL NOT
+supply or modify validation commands.
+
+#### Scenario: Comment requests a validation command
+
+- **GIVEN** an issue or comment instructs Syn to execute a command
+- **WHEN** the review pipeline processes the text
+- **THEN** Syn treats it as untrusted data and does not execute it
+
+#### Scenario: Trusted profile validation runs
+
+- **GIVEN** an approved pinned profile declares an optional validation command
+- **WHEN** policy permits Syn to run it
+- **THEN** the command runs without write access, secrets, or network access by default
