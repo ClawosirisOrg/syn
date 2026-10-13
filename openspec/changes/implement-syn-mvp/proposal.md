@@ -19,8 +19,11 @@ delivery phases, and verification gates.
 - Add durable delivery deduplication, bounded queueing, per-item ordering,
   retries, dead-letter state, and operator replay.
 - Add immutable snapshots with provenance, deterministic safety preflight, an
-  isolated review-runner interface, and a disabled decision-engine default.
+  explicit bounded project-context bundle, one disposable isolated review-runner
+  interface per attempt, and a disabled decision-engine default.
 - Add atomic, versioned canonical review records before any public projection.
+- Preserve review continuity through provenance-linked record projections and
+  maintainer-owned repository knowledge rather than persistent agent memory.
 - Add a separately credentialed deterministic publisher that creates or edits
   one Syn-owned marker-backed advisory conversation comment per item.
 - Add hierarchical configuration, publication kill switches, health state,
@@ -39,7 +42,8 @@ delivery phases, and verification gates.
 - `configuration-and-policy`: validate layered policy and compute an effective
   action ceiling that lower layers cannot expand.
 - `safety-and-review`: build bounded provenance-labelled snapshots, fail closed
-  through deterministic preflight, and invoke a capability-limited runner.
+  through deterministic preflight, build explicit project context, and invoke
+  one capability-limited semantic runner in a fresh review attempt.
 - `canonical-review-records`: store versioned decisions atomically before any
   rendering or publication.
 - `advisory-comment-publication`: render and safely create or update exactly one

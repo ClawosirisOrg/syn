@@ -19,6 +19,7 @@ The first release is advisory-only. It may:
 
 - read allowlisted issue, pull-request, and repository context;
 - run a mandatory safety gate before any model or agent invocation;
+- invoke one project-aware semantic reviewer in a fresh read-only attempt;
 - create a durable, schema-validated review record;
 - publish one marker-backed advisory comment per reviewed item; and
 - privately quarantine security-shaped or secret-bearing work.
@@ -35,6 +36,12 @@ product state. No dormant mutation path belongs in the MVP.
 5. Snapshot drift, missing policy, malformed output, or scanner failure blocks
    publication.
 6. Probabilistic stages may make a decision stricter, never less strict.
+7. One `ReviewRunner` owns semantic review for an attempt; a generic model
+   verdict never gates access to a second project reviewer.
+8. Reviewer continuity comes from bounded, provenance-linked context and
+   canonical records, not persistent agent sessions or self-authored memory.
+9. Review and coding are separate capabilities even when the same underlying
+   agent implementation can perform both roles.
 
 See [docs/architecture.md](docs/architecture.md) for the initial architecture
 and trust boundaries.

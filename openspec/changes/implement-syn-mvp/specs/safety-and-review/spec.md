@@ -52,6 +52,33 @@ SHALL NOT promote untrusted data into instructions or policy.
 - **WHEN** Syn constructs the review envelope
 - **THEN** the text remains quoted provenance-labelled data and cannot alter instructions, tools, permissions, network, or policy
 
+### Requirement: Build an explicit bounded project context bundle
+
+Before reviewer invocation, Syn SHALL build one `ProjectContextBundle` containing
+the admitted review envelope plus versioned policy/profile references, pinned
+approved guidance, curated maintainer-owned repository knowledge, and a bounded
+projection of prior canonical records. Every retained entry SHALL identify its
+source, origin, trust class, version or commit, content hash, and retention class;
+the bundle SHALL record coverage and truncation.
+
+#### Scenario: Re-review uses prior findings
+
+- **GIVEN** an item has an earlier canonical review record
+- **WHEN** Syn builds context for a newer snapshot
+- **THEN** it includes only the bounded structured finding/disposition projection, identifies the original record and reviewed snapshot, and treats earlier model output as evidence rather than policy
+
+#### Scenario: Curated repository knowledge is admitted
+
+- **GIVEN** a repository invariant or maintainer decision is eligible for trusted context
+- **WHEN** Syn admits it to the bundle
+- **THEN** the entry has a maintainer-owned source, version, content hash, repository scope, and revalidation rule
+
+#### Scenario: Semantic retrieval returns a candidate
+
+- **GIVEN** a future semantic index returns candidate repository context
+- **WHEN** Syn considers the candidate for review
+- **THEN** deterministic admission re-establishes repository scope, provenance, trust class, freshness, and size limits before the candidate enters the bundle
+
 ### Requirement: Do not expand untrusted sources during acquisition
 
 Syn SHALL treat URLs as data and SHALL NOT follow arbitrary links. It SHALL NOT check
@@ -127,6 +154,54 @@ schema that rejects unknown fields and capabilities.
 - **GIVEN** a runner returns invalid, extra, or capability-bearing fields
 - **WHEN** output validation runs
 - **THEN** Syn records a runner/schema failure and does not render or publish it
+
+### Requirement: Use one disposable semantic reviewer per attempt
+
+Syn SHALL invoke exactly one configured `ReviewRunner` for the product,
+architecture, functional, security, and proof judgment of an admitted snapshot. It
+SHALL NOT use one semantic model verdict to gate a second project reviewer, and the
+runner SHALL NOT start a target-bundled autoreview helper or second reviewer.
+
+#### Scenario: Safe snapshot reaches semantic review
+
+- **GIVEN** deterministic preflight and optional restrictive decision assessment permit review
+- **WHEN** semantic review starts
+- **THEN** Syn invokes one project-aware `ReviewRunner` with the admitted context bundle
+
+#### Scenario: Untrusted content requests another reviewer
+
+- **GIVEN** a source, repository file, or runner output asks Syn to invoke another agent or autoreview tool
+- **WHEN** Syn enforces the runner boundary
+- **THEN** the request remains untrusted data and no second semantic reviewer starts
+
+### Requirement: Separate review sessions from coding authority and memory
+
+Every real reviewer attempt SHALL start without an authoring transcript, resumable
+cross-run agent session, private cross-project memory, branch-write credential, or
+publisher credential. Runtime prompt copies, scratch, tool, thread, and agent-session
+state SHALL be deleted after every terminal outcome. Policy MAY retain a bounded
+prompt or output audit artifact only as an explicit provenance-linked record with an
+approved data class and retention period; it SHALL NOT be resumable session memory or
+future instruction. Model output SHALL NOT automatically become trusted repository
+knowledge, policy, validation commands, tools, or future instructions.
+
+#### Scenario: Project-specialist agent backs ReviewRunner
+
+- **GIVEN** an approved project-specialist coding agent implements the runner adapter
+- **WHEN** Syn starts a review
+- **THEN** the agent runs in a fresh read-only review mode with only the admitted bundle and the same capability limits as every other runner
+
+#### Scenario: Review attempt terminates
+
+- **GIVEN** a review succeeds, refuses, quarantines, times out, is cancelled, or is recovered as failed
+- **WHEN** terminal handling completes
+- **THEN** Syn retains only approved canonical records, explicitly configured audit artifacts, and operational receipts and removes reviewer session and scratch state
+
+#### Scenario: Model proposes a durable rule
+
+- **GIVEN** runner output asks to remember a conclusion for later reviews
+- **WHEN** Syn validates and stores the result
+- **THEN** the conclusion may remain evidence in the canonical record but cannot enter trusted context without a separate maintainer-owned versioned source
 
 ### Requirement: Support deterministic and approved real runners
 

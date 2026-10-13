@@ -8,6 +8,12 @@ run deterministic safety checks, ask a constrained reviewer for structured outpu
 store the canonical decision, then independently decide whether a comment may be
 created or updated.
 
+The reviewer is project-aware but disposable. Syn reconstructs each attempt from
+an explicit context manifest instead of relying on a persistent model session or an
+agent's private memory. One configured `ReviewRunner` owns semantic review for the
+attempt; deterministic gates are not a preliminary model review, and coding remains
+a separate capability.
+
 The implementation must serve both automatic webhook processing and manual fixture
 or live-item review without creating a second, less-protected pipeline. Filesystem
 state is acceptable for the single-instance proof of concept, but receipt, queue,
@@ -20,6 +26,8 @@ record, and publication transitions must survive restart and remain inspectable.
 - Keep webhook, GitHub read, model-provider, and GitHub comment credentials in
   separate capability domains.
 - Produce deterministic identities, immutable evidence, and an auditable record.
+- Reconstruct project-specific review context from bounded, provenance-linked
+  sources and dispose of reviewer session state after every terminal outcome.
 - Publish useful advice by creating or editing one stable Syn-owned comment.
 - Demonstrate organization-neutral behavior with two profiles and one core.
 
@@ -31,6 +39,8 @@ record, and publication transitions must survive restart and remain inspectable.
   unapproved attachments.
 - Hosted multi-tenancy, high availability, horizontal workers, or a dashboard.
 - Autonomous repair, coding, approval, merge, release, or decision-model enforcement.
+- A generic semantic review followed by a second project reviewer, persistent
+  free-form reviewer memory, or reuse of an authoring session for review.
 
 ## Architecture
 
@@ -43,6 +53,7 @@ GitHub webhook
   -> source normalizer, provenance manifest, and snapshot hash
   -> deterministic safety preflight
   -> optional DecisionEngine (disabled by default)
+  -> bounded ProjectContextBundle
   -> ReviewRunner (no GitHub credential)
   -> strict output validation
   -> atomic canonical review record
@@ -118,6 +129,33 @@ model, and adapter versions recorded. The runner has no GitHub token, unrelated
 secrets, shell, arbitrary tools, or unrestricted network path. The initial adapter
 may use direct OpenAI-compatible HTTP through a destination allowlist.
 
+`ProjectContextBundle` is the complete retained-context input for an attempt. It
+contains versioned policy/profile references, pinned approved guidance, curated
+maintainer-owned repository decisions and invariants, and a bounded projection of
+prior canonical review records. Each entry records a stable source identifier,
+origin, trust class, version or commit, content hash, and retention class; the
+bundle records coverage and truncation. Earlier model prose is not copied into an
+instruction channel. Prior findings and dispositions remain quoted data linked to
+their original record and reviewed snapshot.
+
+Syn invokes exactly one semantic `ReviewRunner` for a review attempt and SHALL NOT
+allow the runner to start a target-bundled autoreview helper or second reviewer. A
+project-specialist coding agent may implement the interface only through a fresh
+read-only review session under the same tool, network, credential, and output
+limits. It receives no authoring transcript, private cross-project memory,
+branch-write credential, or publisher credential. Any later code change requires a
+separate maintainer-authorized workflow outside the MVP.
+
+Runtime prompt copies, scratch, tool, thread, and agent-session state are ephemeral.
+Syn deletes them after success, refusal, quarantine, timeout, cancellation, or
+recovered failure. Policy may retain a bounded prompt or output audit artifact only
+as an explicit, provenance-linked record with its own data-class approval and
+retention period; it is never resumable session memory or future instruction. The
+validated canonical record, admitted context manifest, and approved operational
+receipts survive according to policy. Model-generated text cannot add itself to
+trusted repository knowledge or become policy, validation commands, tools, or
+future instructions.
+
 `DecisionEngine` is a separate optional interface. The `disabled` implementation is
 the normal MVP setting. Any future engine may only restrict routing and can never
 clear a deterministic finding or authorize publication.
@@ -131,10 +169,10 @@ a validation command.
 ### Records and publication
 
 The record identity is derived from repository/item identity, snapshot hash, policy
-and profile versions, gate version, runner identity/version, schema version, and
-normalized triggering event identity. Records are immutable JSON written with a
-temporary file, fsync, atomic rename, and parent-directory sync. A canonical record
-must exist before rendering or any GitHub write.
+and profile versions, gate version, context-bundle hash, runner identity/version,
+schema version, and normalized triggering event identity. Records are immutable JSON
+written with a temporary file, fsync, atomic rename, and parent-directory sync. A
+canonical record must exist before rendering or any GitHub write.
 
 Publication status is an append-only or separately linked receipt so the review
 decision does not change after storage. It records the intended operation, internal
@@ -204,6 +242,16 @@ The interfaces for delivery store, queue, record store, and publication receipt
 store remain backend-neutral so a later transactional database can replace the
 filesystem without changing product behavior.
 
+The state root is not a model-memory store. It does not retain resumable reviewer
+sessions, raw authoring transcripts, private coding-agent memory, or free-form model
+notes for future instruction. A configured prompt/output audit record is separately
+typed, bounded, access-controlled, and retention-governed; it cannot be resumed or
+admitted as trusted context. Re-review continuity is reconstructed from identified
+canonical records through a bounded projection whose record IDs, reviewed snapshot
+hashes, coverage, and truncation are stored in the new context manifest. Curated
+repository knowledge remains maintainer-owned versioned input rather than model-
+authored state.
+
 ## Failure handling and rollback
 
 Every stage returns a typed outcome and terminal error class. Retriable infrastructure
@@ -231,6 +279,9 @@ mutation path.
   writes outside the Issues comment client, and reconciliation after uncertain writes.
 - Credential-boundary tests inject sentinel secrets and prove they are unavailable
   to forbidden components and subprocess environments.
+- Context-boundary tests prove one semantic reviewer per attempt, no target-bundled
+  second reviewer, no authoring-session/bootstrap memory, bounded prior-record
+  projection, and cleanup of reviewer session and scratch state.
 - Golden fixture suites cover VIA-style and simple-alert-proxy behavior through
   profiles only; an adversarial corpus covers all issue #3 detector classes.
 - Fuzz tests target verified webhook decoding, normalization, parsers, and marker
@@ -258,6 +309,14 @@ risk without being necessary to prove useful advisory review.
 A single installation token would be simpler, but an accidental token leak into the
 runner would then cross the write boundary. Separate components and permissions make
 the intended ceiling enforceable and testable.
+
+### Records instead of persistent reviewer memory
+
+Persistent agent sessions would make review behavior depend on hidden, stale, or
+attacker-influenced state that maintainers cannot reproduce. Syn therefore stores
+immutable records and explicit context references, then reconstructs each attempt.
+This costs some context assembly but makes authority, freshness, retention, and
+prompt-injection boundaries inspectable.
 
 ### No public comment for quarantine or refusal
 

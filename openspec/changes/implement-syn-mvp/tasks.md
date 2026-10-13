@@ -4,7 +4,8 @@
   action ceiling, stop conditions, and operator rollback procedure.
 - [ ] 1.2 Define strict versioned schemas for service policy/config, organization policy,
   repository profile, source manifest, safety result, review decision, canonical
-  record, delivery receipt, and publication receipt.
+  record, project-context manifest, prior-record projection, delivery receipt,
+  and publication receipt.
 - [ ] 1.3 Implement unknown-field rejection and effective-policy intersection;
   test that lower layers and overprivileged credentials cannot expand the ceiling.
 - [ ] 1.4 Add safe example configurations with intake and publication default-off
@@ -19,14 +20,17 @@
   defaults, and documented exit codes.
 - [ ] 2.2 Implement source normalization, canonical ordering, provenance manifests,
   trust partitioning, deterministic hashes, incomplete-source refusal, and pinned
-  default-branch `CODEOWNERS` resolution with explicit fallback behavior.
+  default-branch `CODEOWNERS` resolution with explicit fallback behavior; add the
+  bounded `ProjectContextBundle` with coverage and truncation metadata.
 - [ ] 2.3 Implement deterministic safety orchestration, detector interfaces, all
   four outcomes, bounded redaction references, and fail-closed scanner behavior.
 - [ ] 2.4 Implement `DecisionEngine` with the fully functional `disabled` default.
 - [ ] 2.5 Implement `ReviewRunner`, strict output validation, and a deterministic
-  fake that exposes invocation counts for negative safety tests.
+  fake that exposes invocation counts for negative safety tests; enforce exactly one
+  semantic reviewer per attempt and reject target-bundled second-reviewer requests.
 - [ ] 2.6 Implement atomic filesystem review records and deterministic dry-run
-  rendering from stored validated records only.
+  rendering from stored validated records only, including context-bundle hashes,
+  prior-record references, and bounded history coverage.
 - [ ] 2.7 Add sanitized VIA-style, simple-alert-proxy, and adversarial fixtures;
   document fixture provenance and verify both pilots use the same core interfaces
   and schemas with no private-repository data unless synthetic or explicitly sanitized.
@@ -36,6 +40,9 @@
   reports, oversized/binary/archive data, unsafe paths, incomplete sources, scanner
   failure, malformed runner output, webhook spoof/replay/order cases, marker/author
   ambiguity, uncertain writes, and benign lookalikes for detector classes.
+- [ ] 2.9 Add reviewer-lifecycle tests for fresh sessions, absent authoring/private
+  memory, no branch or publisher credentials, bounded prior-record projection,
+  model-memory poisoning attempts, and cleanup after every terminal outcome.
 
 ## 3. Automatic GitHub intake
 
@@ -57,11 +64,13 @@
 ## 4. Real reviewer integration
 
 - [ ] 4.1 Implement one approved backend behind `ReviewRunner` with destination
-  allowlisting, explicit provider/data-class policy, timeouts, and cancellation.
+  allowlisting, explicit provider/data-class policy, timeouts, cancellation, and
+  fresh read-only project-specialist review mode where an agent adapter is used.
 - [ ] 4.2 Strip ambient secrets and GitHub credentials, deny general-purpose tools,
+  authoring transcripts, bootstrap/private agent memory, branch-write authority,
   and validate all backend output against the strict decision schema.
 - [ ] 4.3 Record provider/model/adapter identity, version, latency, token/cost fields,
-  and terminal error class without leaking input or secrets.
+  context-bundle identity, and terminal error class without leaking input or secrets.
 - [ ] 4.4 Compare the backend with deterministic fixtures in dry-run mode and document
   privacy, cost, latency, and failure observations.
 - [ ] 4.5 Block live publication for the fake runner, an unapproved provider/data

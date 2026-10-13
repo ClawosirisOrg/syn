@@ -46,11 +46,24 @@ state and a recovery procedure for receipts, queued work, dead letters, records,
 uncertain publications. Cleanup SHALL not silently delete evidence needed by an
 active or unresolved run.
 
+Runtime prompt copies, scratch, tool, thread, and agent-session state SHALL be
+ephemeral and SHALL be removed after each terminal outcome or bounded crash recovery.
+Policy-approved prompt/output audit records, if configured, SHALL be separately
+typed, bounded, access-controlled, and retention-governed; they SHALL NOT be
+resumable sessions or future instructions. Cleanup of runtime state SHALL NOT remove
+canonical records or receipts required for audit.
+
 #### Scenario: Operator cleans expired records
 
 - **GIVEN** configured retention has expired and no run or publication remains unresolved
 - **WHEN** cleanup executes
 - **THEN** Syn removes eligible state deterministically and reports what was removed
+
+#### Scenario: Reviewer process terminates
+
+- **GIVEN** a reviewer attempt reaches any terminal outcome
+- **WHEN** terminal cleanup or startup reconciliation runs
+- **THEN** ephemeral reviewer session and scratch state is removed while canonical records and required receipts remain governed by retention policy
 
 ### Requirement: Expose a terminal state for accepted deliveries
 
