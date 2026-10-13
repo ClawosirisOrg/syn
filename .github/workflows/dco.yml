@@ -1,0 +1,23 @@
+name: DCO
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: dco
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check commit sign-offs
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
+          HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
+        run: ./scripts/check-dco.sh "$BASE_REVISION" "$HEAD_REVISION"

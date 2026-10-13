@@ -3,6 +3,39 @@
 Syn is security-sensitive infrastructure. Small, reviewable changes with clear
 tests are preferred.
 
+## Developer Certificate of Origin
+
+Syn uses the [Developer Certificate of Origin 1.1](DCO). By contributing, you
+certify that you have the right to submit the work under the repository's
+license and agree to the terms in that certificate.
+
+Every human-authored commit in a pull request must include a `Signed-off-by`
+trailer whose email address matches the commit author's email address. Git can
+add the trailer for you:
+
+```bash
+git commit --signoff -m "Describe the change"
+```
+
+To sign off the most recent commit after creating it:
+
+```bash
+git commit --amend --signoff --no-edit
+```
+
+To add your sign-off while rebasing every commit on a branch, then safely
+update the pull request:
+
+```bash
+git fetch origin
+git rebase --signoff origin/main
+git push --force-with-lease
+```
+
+Do not add another person's sign-off. The pull-request DCO check excludes
+merge commits and recognized automation commits, and rejects missing,
+malformed, or author-mismatched sign-offs.
+
 ## Before opening a pull request
 
 1. Open or reference an issue for behavior changes.
