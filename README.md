@@ -1,3 +1,11 @@
+<p align="center">
+  <img
+    src="docs/assets/syn-logo-avatar.jpg"
+    alt="Syn, the Norse goddess of denial, raising her hand in refusal"
+    width="360"
+  >
+</p>
+
 # Syn
 
 Syn is a conservative, auditable GitHub review service inspired by
@@ -27,6 +35,8 @@ defender:
 
 That is Syn's job in software form: guard the trust boundary, refuse what has
 not earned admission, and make every denial explainable.
+
+The illustration above is Syn's canonical logo and avatar.
 
 > [!IMPORTANT]
 > Syn is in its initial design and scaffolding phase. It is not ready to
