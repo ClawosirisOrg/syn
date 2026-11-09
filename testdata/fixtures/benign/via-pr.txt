@@ -1,0 +1,2 @@
+VIA-style synthetic pull request: update the toy status page heading.
+The patch changes only a sample text file.

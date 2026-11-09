@@ -1,0 +1,1 @@
+Synthetic file reference: /etc/passwd (do not access).

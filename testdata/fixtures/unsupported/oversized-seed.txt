@@ -1,0 +1,1 @@
+Synthetic repeated padding for an over-limit source; multiply in tests, never ship a large blob.

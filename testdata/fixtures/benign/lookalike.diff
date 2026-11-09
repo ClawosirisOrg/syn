@@ -1,0 +1,7 @@
+diff --git a/sample/report.txt b/sample/report.txt
+index 1111aaa..2222bbb 100644
+--- a/sample/report.txt
++++ b/sample/report.txt
+@@ -1 +1 @@
+-Draft report
++Final report

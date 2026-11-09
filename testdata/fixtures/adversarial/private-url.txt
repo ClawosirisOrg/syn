@@ -1,0 +1,1 @@
+Synthetic internal link (do not fetch): http://127.0.0.1:8123/example

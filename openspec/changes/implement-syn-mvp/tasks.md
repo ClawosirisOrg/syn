@@ -1,16 +1,19 @@
 ## 1. Threat boundary and schemas
 
-- [ ] 1.1 Document the threat model, credential boundaries, immutable service
+Local task evidence below does not constitute Phase 0 acceptance: published changes still need CodeQL verification, review, and issue/PRD tracker updates.
+
+- [x] 1.1 Document the threat model, credential boundaries, immutable service
   action ceiling, stop conditions, and operator rollback procedure.
-- [ ] 1.2 Define strict versioned schemas for service policy/config, organization policy,
+- [x] 1.2 Define strict versioned schemas for service policy/config, organization policy,
   repository profile, source manifest, safety result, review decision, canonical
   record, project-context manifest, prior-record projection, delivery receipt,
   and publication receipt.
-- [ ] 1.3 Implement unknown-field rejection and effective-policy intersection;
-  test that lower layers and overprivileged credentials cannot expand the ceiling.
-- [ ] 1.4 Add safe example configurations with intake and publication default-off
+- [x] 1.3 Implement unknown-field rejection and effective-policy intersection;
+  test supported/future versions, invalid references, YAML/JSON equivalence,
+  lower-layer non-escalation, and excess credential permissions.
+- [x] 1.4 Add safe example configurations with intake and publication default-off
   and no representation for forbidden GitHub mutations.
-- [ ] 1.5 Add `AGPL-3.0-or-later` SPDX identifiers to all new source files and
+- [x] 1.5 Add `AGPL-3.0-or-later` SPDX identifiers to all new source files and
   verify that generated or bundled material has compatible licensing metadata.
 
 ## 2. Shared fixture pipeline

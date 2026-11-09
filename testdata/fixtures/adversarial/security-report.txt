@@ -1,0 +1,1 @@
+Synthetic security vulnerability report: toy test-only input is malformed. No real vulnerability is described.

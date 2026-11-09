@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Replace all illustrative names with explicit, approved targets before use.
+version: 1
+organization: example-org
+repository_allowlist:
+  - example-org/example-repo
+event_allowlist:
+  - issues/opened
+  - pull_request/opened
+# No data class is enabled by default.
+data_classes: []
+publication:
+  issue_comments: false
+  pull_request_comments: false

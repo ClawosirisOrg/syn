@@ -1,0 +1,7 @@
+diff --git a/sample/status.txt b/sample/status.txt
+index 1234abc..5678def 100644
+--- a/sample/status.txt
++++ b/sample/status.txt
+@@ -1 +1 @@
+-Status: pending
++Status: ready

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Example identities only: installation access never enables intake or writes.
+version: 1
+intake_enabled: false
+publication_enabled: false
+repository_allowlist:
+  - example-org/example-repo
+event_allowlist:
+  - issues/opened
+  - pull_request/opened
+data_classes: []
+publication:
+  issue_comments: false
+  pull_request_comments: false

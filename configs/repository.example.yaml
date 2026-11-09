@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+version: 1
+organization: example-org
+repository: example-org/example-repo
+event_allowlist:
+  - issues/opened
+  - pull_request/opened
+data_class: public
+# Unknown ownership never selects or infers a maintainer. Any alternate
+# fallback requires a bounded explicit list and trusted-metadata verification.
+ownership_fallback:
+  missing: refuse
+  malformed: refuse
+  ambiguous: refuse
+  unmatched: refuse
+  approved_maintainers: []
+publication:
+  issue_comments: false
+  pull_request_comments: false

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "organization": "example-org",
+  "repository_allowlist": ["example-org/example-repo"],
+  "event_allowlist": ["issues/opened", "pull_request/opened"],
+  "data_classes": [],
+  "publication": {"issue_comments": false, "pull_request_comments": false}
+}

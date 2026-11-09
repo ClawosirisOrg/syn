@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Command syn is the entry point for the Syn review service.
+// Command syn exposes only offline Phase 1 operations; live commands fail closed.
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -12,23 +11,35 @@ import (
 
 var version = "dev"
 
+// Exit codes: 0 success, 2 invalid input, 3 safety stop, 4 unavailable,
+// 5 local operation failure, 124 deadline/cancellation.
 func run(args []string, stdout, stderr io.Writer) int {
-	flags := flag.NewFlagSet("syn", flag.ContinueOnError)
-	flags.SetOutput(stderr)
-	showVersion := flags.Bool("version", false, "print the Syn version")
-	if err := flags.Parse(args); err != nil {
-		return 2
-	}
-
-	if *showVersion {
+	if len(args) == 1 && args[0] == "--version" {
 		fmt.Fprintln(stdout, version)
 		return 0
 	}
-
-	fmt.Fprintln(stdout, "Syn is in its initial design and scaffolding phase.")
-	return 0
+	if len(args) == 0 {
+		fmt.Fprintln(stderr, "usage: syn <version|validate-config|review-fixture|serve|review-github|replay-delivery> (see cmd/syn/README.md)")
+		return 2
+	}
+	switch args[0] {
+	case "version":
+		if len(args) != 1 {
+			fmt.Fprintln(stderr, "version takes no arguments")
+			return 2
+		}
+		fmt.Fprintln(stdout, version)
+		return 0
+	case "validate-config":
+		return validateConfig(args[1:], stdout, stderr)
+	case "review-fixture":
+		return reviewFixture(args[1:], stdout, stderr)
+	case "serve", "review-github", "replay-delivery":
+		fmt.Fprintln(stderr, "unavailable: live intake, credentials, provider, replay and publication are disabled")
+		return 4
+	default:
+		fmt.Fprintln(stderr, "unknown command or flag")
+		return 2
+	}
 }
-
-func main() {
-	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
-}
+func main() { os.Exit(run(os.Args[1:], os.Stdout, os.Stderr)) }

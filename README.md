@@ -72,8 +72,12 @@ product state. No dormant mutation path belongs in the MVP.
 9. Review and coding are separate capabilities even when the same underlying
    agent implementation can perform both roles.
 
-See [docs/architecture.md](docs/architecture.md) for the initial architecture
-and trust boundaries.
+See [docs/architecture.md](docs/architecture.md) for the initial architecture,
+[docs/security-boundary.md](docs/security-boundary.md) for the threat and rollback
+contract, and [docs/policy-config.md](docs/policy-config.md) for versioned policy
+eligibility. See [docs/phase1-local.md](docs/phase1-local.md) for the
+fixture-only implementation limits. These describe planned controls, not a
+deployable service.
 
 ## Development
 

@@ -1,0 +1,2 @@
+Simple-alert-proxy style synthetic alert: example queue depth crossed a toy threshold.
+Observed count: 4; expected maximum: 3. Request an advisory explanation only.

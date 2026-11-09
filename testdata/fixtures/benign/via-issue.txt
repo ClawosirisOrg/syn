@@ -1,0 +1,2 @@
+VIA-style synthetic issue: add an optional compact summary to a toy status page.
+Acceptance: existing empty state remains unchanged; document the new toggle.
